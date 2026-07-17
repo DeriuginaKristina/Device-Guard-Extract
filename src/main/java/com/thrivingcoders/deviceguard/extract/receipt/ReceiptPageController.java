@@ -1,5 +1,9 @@
 package com.thrivingcoders.deviceguard.extract.receipt;
 
+import java.io.IOException;
+import java.util.Base64;
+import java.util.Set;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,8 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Controller
 public class ReceiptPageController {
+
+    private static final Set<String> SUPPORTED_CONTENT_TYPES = Set.of(
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+    );
 
     @GetMapping("/")
     public String showUploadPage() {
@@ -25,10 +36,37 @@ public class ReceiptPageController {
             return "receipt-upload";
         }
 
-        model.addAttribute("fileName", file.getOriginalFilename());
-        model.addAttribute("contentType", file.getContentType());
-        model.addAttribute("fileSize", file.getSize());
+        final String contentType = file.getContentType();
 
-        return "receipt-upload";
+        if (contentType == null || !SUPPORTED_CONTENT_TYPES.contains(contentType)) {
+            model.addAttribute(
+                    "error",
+                    "Unsupported image format. Please upload JPEG, PNG or WebP."
+            );
+            return "receipt-upload";
+        }
+
+        try {
+            final String encodedImage = Base64.getEncoder()
+                    .encodeToString(file.getBytes());
+
+            final String imageDataUrl =
+                    "data:" + contentType + ";base64," + encodedImage;
+
+            model.addAttribute("fileName", file.getOriginalFilename());
+            model.addAttribute("contentType", contentType);
+            model.addAttribute("fileSize", file.getSize());
+            model.addAttribute("imageDataUrl", imageDataUrl);
+
+            return "receipt-upload";
+
+        } catch (IOException exception) {
+            model.addAttribute(
+                    "error",
+                    "The receipt image could not be read."
+            );
+
+            return "receipt-upload";
+        }
     }
 }
