@@ -1,3 +1,11 @@
 spring:
   application:
-    name: Device-Guard-Extract
+    name: device-guard-extract
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4.1
+          temperature: 0.2
