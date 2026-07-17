@@ -21,6 +21,12 @@ public class ReceiptPageController {
             "image/webp"
     );
 
+    private final ReceiptAiService receiptAiService;
+
+    public ReceiptPageController(final ReceiptAiService receiptAiService) {
+        this.receiptAiService = receiptAiService;
+    }
+
     @GetMapping("/")
     public String showUploadPage() {
         return "receipt-upload";
@@ -32,13 +38,18 @@ public class ReceiptPageController {
             final Model model
     ) {
         if (file.isEmpty()) {
-            model.addAttribute("error", "Please select a receipt image.");
+            model.addAttribute(
+                    "error",
+                    "Please select a receipt image."
+            );
             return "receipt-upload";
         }
 
         final String contentType = file.getContentType();
 
-        if (contentType == null || !SUPPORTED_CONTENT_TYPES.contains(contentType)) {
+        if (contentType == null
+                || !SUPPORTED_CONTENT_TYPES.contains(contentType)) {
+
             model.addAttribute(
                     "error",
                     "Unsupported image format. Please upload JPEG, PNG or WebP."
@@ -47,16 +58,22 @@ public class ReceiptPageController {
         }
 
         try {
+            final byte[] imageBytes = file.getBytes();
+
             final String encodedImage = Base64.getEncoder()
-                    .encodeToString(file.getBytes());
+                    .encodeToString(imageBytes);
 
             final String imageDataUrl =
                     "data:" + contentType + ";base64," + encodedImage;
+
+            final ReceiptExtraction extraction =
+                    receiptAiService.extract(imageBytes, contentType);
 
             model.addAttribute("fileName", file.getOriginalFilename());
             model.addAttribute("contentType", contentType);
             model.addAttribute("fileSize", file.getSize());
             model.addAttribute("imageDataUrl", imageDataUrl);
+            model.addAttribute("extraction", extraction);
 
             return "receipt-upload";
 
@@ -64,6 +81,14 @@ public class ReceiptPageController {
             model.addAttribute(
                     "error",
                     "The receipt image could not be read."
+            );
+
+            return "receipt-upload";
+
+        } catch (RuntimeException exception) {
+            model.addAttribute(
+                    "error",
+                    "AI extraction failed: " + exception.getMessage()
             );
 
             return "receipt-upload";
