@@ -7,6 +7,9 @@ import java.util.List;
 public record ReceiptExtraction(
         String sellerName,
         String sellerAddress,
+        String receiptLanguage,
+        String receiptCountry,
+        String purchaseDateRaw,
         String purchaseDate,
         String purchaseTime,
         String receiptNumber,

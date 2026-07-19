@@ -12,11 +12,15 @@ import org.springframework.util.MimeTypeUtils;
 public class ReceiptAiService {
 
     private final ChatClient chatClient;
+    private final ReceiptExtractionValidator validator;
 
-    public ReceiptAiService(final ChatClient.Builder chatClientBuilder) {
+    public ReceiptAiService(
+            final ChatClient.Builder chatClientBuilder,
+            final ReceiptExtractionValidator validator
+    ) {
         this.chatClient = chatClientBuilder.build();
+        this.validator = validator;
     }
-
     public ReceiptExtraction extract(
             final byte[] imageBytes,
             final String contentType
@@ -28,11 +32,18 @@ public class ReceiptAiService {
 
         final Media image = new Media(mimeType, imageResource);
 
-        return chatClient.prompt()
+        final ReceiptExtraction extraction = chatClient.prompt()
                 .user(user -> user
                         .text(ReceiptPrompt.EXTRACT_RECEIPT)
                         .media(image))
                 .call()
                 .entity(ReceiptExtraction.class);
+
+        if (extraction == null) {
+            throw new IllegalStateException(
+                    "OpenAI returned no receipt extraction.");
+        }
+
+        return validator.validate(extraction);
     }
 }
