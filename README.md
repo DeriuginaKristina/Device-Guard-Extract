@@ -76,17 +76,9 @@ Rendered extraction result
 
 ## Screenshot
 
-Add a project screenshot to the repository, for example:
-
-```text
-docs/images/receipt-extraction-demo.png
-```
-
-Then replace this section with:
 
 ```markdown
-![Device Guard receipt extraction demo](docs/images/receipt-extraction-demo.png)
-```
+![Device Guard receipt extraction demo](img.png)
 
 ---
 
