@@ -10,6 +10,7 @@ public record ReceiptExtraction(
         String receiptLanguage,
         String receiptCountry,
         String purchaseDateRaw,
+        String purchaseDateFormat,
         String purchaseDate,
         String purchaseTime,
         String receiptNumber,

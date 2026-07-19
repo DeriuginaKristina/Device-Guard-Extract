@@ -204,6 +204,23 @@
             color: #64748b;
             font-size: 14px;
         }
+
+        .date-value {
+            display: block;
+        }
+
+        .date-format {
+            display: block;
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .not-detected {
+            color: #64748b;
+        }
     </style>
 </head>
 
@@ -303,7 +320,25 @@
 
                             <div>
                                 <dt>Purchase date</dt>
-                                <dd th:text="${extraction.purchaseDate ?: 'Not detected'}"></dd>
+
+                                <dd th:if="${extraction.purchaseDateRaw}">
+        <span
+                class="date-value"
+                th:text="${extraction.purchaseDateRaw}">
+        </span>
+
+                                    <small
+                                            class="date-format"
+                                            th:if="${extraction.purchaseDateFormat}"
+                                            th:text="${extraction.purchaseDateFormat}">
+                                    </small>
+                                </dd>
+
+                                <dd
+                                        class="not-detected"
+                                        th:unless="${extraction.purchaseDateRaw}">
+                                    Not detected
+                                </dd>
                             </div>
 
                             <div>

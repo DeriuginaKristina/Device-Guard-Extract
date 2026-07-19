@@ -12,6 +12,44 @@ public final class ReceiptPrompt {
             - Use null when a value cannot be determined.
             - Preserve product names as printed on the receipt.
             
+            DATE EXTRACTION RULES:
+            - Search the entire receipt for a calendar date.
+            - A date may appear together with a time.
+            - If a line contains both date and time, split them.
+            - The date is always before the time.
+            - Never discard a detected date because it shares the line with the time.
+            - Return purchaseDate in ISO-8601 format (yyyy-MM-dd).
+            - purchaseDateRaw must contain the date exactly as printed on the receipt.
+            - purchaseDateFormat must describe the printed date pattern using:
+              DD for day, MM for month, YY for a two-digit year and YYYY for a four-digit year.
+            - Preserve the original separators in purchaseDateFormat.
+            - Examples:
+              04.07.26 -> DD.MM.YY
+              04.07.2026 -> DD.MM.YYYY
+              07/04/2026 -> MM/DD/YYYY when the receipt locale is the United States
+              2026-07-04 -> YYYY-MM-DD
+            - purchaseDate must contain the normalized ISO-8601 date YYYY-MM-DD.
+            
+            ITEM EXTRACTION RULES
+            
+            Return only products or services that were actually purchased.
+            
+            Never return:
+            
+            - payment methods
+            - payment transactions
+            - gift card operations
+            - bank card operations
+            - loyalty cards
+            - card numbers
+            - masked card numbers
+            - authorization codes
+            - VAT summaries
+            - discounts
+            - corrections
+            - totals
+            - balances
+            
             Locale and date rules:
             - Determine the receipt language and probable country from all available
               evidence, including language, seller address, currency, tax labels,

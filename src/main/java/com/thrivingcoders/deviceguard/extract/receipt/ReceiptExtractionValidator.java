@@ -52,6 +52,7 @@ public class ReceiptExtractionValidator {
                 source.receiptLanguage(),
                 source.receiptCountry(),
                 source.purchaseDateRaw(),
+                source.purchaseDateFormat(),
                 purchaseDate,
                 source.purchaseTime(),
                 source.receiptNumber(),
